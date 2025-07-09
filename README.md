@@ -178,5 +178,5 @@ db.chats.find().pretty()
 ## 🚧 Future Improvements
 
 - [ ] Add basic frontend (React / Next.js)
-- [ ] Clear/reset chat history per session
 - [ ] Auth support (per-user chats)
+- [ ] Other........
