@@ -74,7 +74,7 @@ mongodb://localhost:27017
 
 ```env
 MONGO_URI=mongodb://localhost:27017
-SESSION_COOKIE=session_id
+OPENROUTER_API_KEY="<put your OpenRouter API KEY>"
 ```
 
 ---
