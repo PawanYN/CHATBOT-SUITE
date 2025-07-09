@@ -1,0 +1,16 @@
+# Ignore all virtual environments (any folder named .venv at any depth)
+**/.venv/
+.venv/
+
+# Ignore all Python cache folders
+__pycache__/
+**/__pycache__/
+
+# Ignore all .env files
+.env
+.env.*
+
+# Ignore all log files at any level
+*.log
+**/*.log
+log/
