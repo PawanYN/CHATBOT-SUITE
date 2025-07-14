@@ -1,6 +1,6 @@
 ## 🌐 Frontend Preview
 
-![Chatbot UI Preview](./frontend/frontend-preview.png)
+![Chatbot UI Preview](./frontend/public/frontend-preview.png)
 
 
 # ⚛️ Chatbot Suite – Frontend (React + Vite + Tailwind)
