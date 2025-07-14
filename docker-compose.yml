@@ -1,9 +1,54 @@
-version: '3'
+version: "3.9"
+
 services:
   mongo:
-    image: mongo
-    container_name: chatbot_mongo
+    image: mongo:6
+    container_name: mongo
     ports:
       - "27017:27017"
     volumes:
-      - ./mongo_data:/data/db
+      - mongo-data:/data/db
+  frontend:
+    build:
+      context: ./frontend
+    working_dir: /app
+    command: npm run dev -- --host
+    ports:
+      - "5173:5173"
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend
+          target: /app
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: ./frontend/package.json
+    environment:
+      - NODE_ENV=development
+
+  backend:
+    build:
+      context: ./backend
+    working_dir: /app
+    command: uvicorn app.main:app --reload --host 0.0.0.0 --port 7000
+    ports:
+      - "7000:7000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    develop:
+      watch:
+        - action: sync
+          path: ./backend
+          target: /app
+          ignore:
+            - __pycache__/
+            - "*.pyc"
+        - action: rebuild
+          path: ./backend/requirements.txt
+volumes:
+  mongo-data: 
+
+      
+
+

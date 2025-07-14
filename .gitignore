@@ -1,16 +1,22 @@
-# Ignore all virtual environments (any folder named .venv at any depth)
-**/.venv/
-.venv/
+# === Backend ===
+backend/__pycache__/
+backend/**/__pycache__/
+backend/log/
+backend/.env
+backend/.venv
+# === Frontend ===
+frontend/.dockerignore
 
-# Ignore all Python cache folders
-__pycache__/
-**/__pycache__/
+# === Project Root ===
+compose.yaml
+inf.txt
 
-# Ignore all .env files
-.env
-.env.*
-
-# Ignore all log files at any level
+# === Common Extras ===
 *.log
-**/*.log
-log/
+*.db
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.bak

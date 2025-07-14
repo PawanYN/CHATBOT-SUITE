@@ -9,6 +9,7 @@ from app.db.mango import db
 
 from fastapi import APIRouter, Request, Response, HTTPException
 from uuid import uuid4
+from pydantic import BaseModel
 
 # import asyncio
 
@@ -23,6 +24,9 @@ router = APIRouter(
     tags=["Chatbot"],         
 )
 
+class ChatInput(BaseModel):
+    query: str
+
 #--------------------2. chatbot routes -------------------------------------------------
 
 
@@ -31,7 +35,7 @@ async def chatbot():
       return "Here, I am to help you out by answering your questions"
     
 @router.post("/chat")
-async def chat(query:str,request: Request, response: Response):
+async def chat(input: ChatInput,request: Request, response: Response):
 
     logger.info("api/chatbot Post /chat entered")
     
@@ -61,7 +65,7 @@ async def chat(query:str,request: Request, response: Response):
         ]
   
     # 3. Add user query to messages
-    messages.append({"role": "user", "content": query})
+    messages.append({"role": "user", "content": input.query})
     print(messages)
     # 4. Get assistant response
     logger.info("OpenRouter assistant starting")

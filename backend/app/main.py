@@ -15,17 +15,17 @@ app = FastAPI(
 # CORS — allow frontend access (React etc.)
 # ───────────────────────
 origins = [
-    "http://localhost:3000",  # frontend dev
-    "http://127.0.0.1:3000",
+    "http://localhost:5173",  # frontend dev
+    "http://127.0.0.1:5173",
     # add prod domain here if needed
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=origins, # frontend URLs
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],   # allow GET, POST, OPTIONS, etc.
+    allow_headers=["*"],   # allow custom headers
 )
 
 

@@ -7,14 +7,15 @@ from pydantic import BaseModel
 
 
 #----------------------- 1. API Key ---------------------
-load_dotenv("D:/Davin.ai/assign/Dravin_new_assign/chatbot-suite/backend/.env",override=True)
+load_dotenv(".env",override=True)
 
 logger.debug("OPENROUTER_API_KEY (first 8 chars): %s", 
              os.getenv("OPENROUTER_API_KEY")[:8] if os.getenv("OPENROUTER_API_KEY") else "NONE")
 
 def get_api_key():
     try:
-      return os.getenv("OPENROUTER_API_KEY")
+      print(os.getenv("OPENROUTER_API_KEY"))
+      return os.getenv("OPENROUTER_API_KEY")    
     except KeyError:
       logger.critical("OPENROUTER_API_KEY not found in .env — shutting down.")
       raise SystemExit(1)

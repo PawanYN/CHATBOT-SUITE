@@ -13,7 +13,7 @@ async def assistant(messages:list):
         base_url="https://openrouter.ai/api/v1",
         api_key=app.core.config.get_api_key(), 
     )
-    
+     
     try:
         response=client.chat.completions.create(
             model=app.core.config.default_model.model,
