@@ -1,125 +1,103 @@
-# 🧠 Chatbot Suite (Backend Only)
+# 🧠 Chatbot Suite – Fullstack AI Chatbot
+A fullstack chatbot built with:
 
-FastAPI + GPT‑4o‑mini backend with MongoDB message history.  
-MongoDB runs locally in Docker.
+- 🔙 **Backend**: FastAPI + OpenRouter (GPT-4o-mini)
+- ⚛️ **Frontend**: React + Vite + Tailwind CSS
+- 🛢️ **Database**: MongoDB (Dockerized)
+- 🐳 **Deployment**: Docker Compose (full watch mode support)
 
-> **Status:** Backend working · Frontend placeholder
+## 🚀 Features
 
----
-
-## ✅ What It Does
-
-- `POST /chatbot/chat?query=...`  
-  → Sends query + history to GPT‑4o‑mini via OpenRouter  
-  → Stores / updates the chat in MongoDB  
-  → Tracks each conversation using a `session_id` cookie
-
----
-
-## 🗂️ Key Folders
-
-```
-backend/
-├─ app/
-│  ├─ api/              # Routes → chatbot.py is the main endpoint
-│  ├─ core/             # config.py (.env loader) + logger.py
-│  ├─ db/               # crud.py (Mongo ops) + mango.py (connect)
-│  ├─ schemas/          # Pydantic models
-│  ├─ services/         # openrouter_client.py (GPT call)
-│  └─ main.py           # FastAPI app entrypoint
-├─ log/
-│  └─ app.log           # App logs saved here
-├─ .env                 # Your secrets / config (excluded from git)
-├─ requirements.txt     # Python dependencies
-├─ run.bat              # One-click server launcher
-docker-compose.yml      # MongoDB Docker container
-frontend/               # (empty for now)
-```
+- Ask anything → get AI-powered responses via OpenRouter
+- Conversations are saved with session-based history (using cookies)
+- MongoDB stores chat messages
+- Fully containerized (Docker Compose)
 
 ---
 
-## 🐋 MongoDB in Docker
+## 📁 Project Structure
 
-This project uses Docker to run MongoDB locally — no manual install needed.
-
-### `docker-compose.yml`
-
-```yaml
-version: '3'
-services:
-  mongo:
-    image: mongo
-    container_name: chatbot_mongo
-    ports:
-      - "27017:27017"
-    volumes:
-      - ./mongo_data:/data/db
+```
+chatbot-suite/
+├── backend/
+│   ├── app/              # FastAPI code
+│   ├── .env              # API keys and Mongo URI
+│   ├── Dockerfile        # Backend image
+│   └── requirements.txt  # Python deps
+├── frontend/
+│   ├── src/              # React + Tailwind UI
+│   ├── Dockerfile        # Frontend image
+│   ├── package.json
+│   └── vite.config.js
+├── docker-compose.yml    # Multi-service definition
+└── README.md             # You are here
 ```
 
-### Start MongoDB
+## 🔗 How Frontend Talks to Backend
+
+- Frontend runs on `http://localhost:5173`
+- It sends `POST` requests to `http://localhost:7000/api/chatbot/chat`
+- Requests include cookies for session tracking (`credentials: include`)
+- Backend responds with updated messages and stores them in MongoDB : `mongodb://mongo:27017`
+
+---
+
+## 🐋 Run the Fullstack App with Docker Compose
+
+Make sure Docker and Docker Compose are installed.
+
+### 1. Clone and Navigate
 
 ```bash
-docker-compose up -d
+git clone https://github.com/PawanYN/chatbot-suite.git
+cd chatbot-suite
+```
+### 2. Add `.env` in Backend
+
+Create `backend/.env`:
+
+```
+OPENROUTER_API_KEY=your_api_key_here
+MONGO_URI=mongodb://mongo:27017
+```
+> You’ll get your OpenRouter key from https://openrouter.ai/docs/api-reference/authentication
+
+### 3. Start All Services
+
+```bash
+docker compose up --build
 ```
 
-Mongo will be available at:
+Services started:
 
-```
-mongodb://localhost:27017
-```
+- 🔁 `http://localhost:5173` → Frontend (Vite Dev Server)
+- 🧠 `http://localhost:7000` → FastAPI backend
+- 📦 MongoDB → running in Docker at `localhost:27017`
 
 ---
 
-## ⚙️ `.env` File (place in `backend/`)
+## 📡 API: Chat Endpoint
 
-```env
-MONGO_URI=mongodb://localhost:27017
-OPENROUTER_API_KEY="<put your OpenRouter API KEY>"
-```
+### POST `/api/chatbot/chat`
 
----
-
-## ▶️ Run the Backend
-
-From the `backend/` directory:
-
-```bash
-run.bat
-```
-
-Or manually:
-
-```bash
-uvicorn app.main:app --reload
-```
-
-FastAPI will run at:
+Frontend and curl/postman clients can hit:
 
 ```
-http://localhost:8000
+POST http://localhost:7000/api/chatbot/chat
 ```
 
----
+**Request JSON**:
 
-## 🔁 Chat Endpoint
-
-### URL
-
-```
-POST /chatbot/chat?query=Hello
+```json
+{ "query": "Who is Krishna?" }
 ```
 
-### Test with curl
-
-```bash
-curl -X POST "http://localhost:8000/chatbot/chat?query=Hello"
-```
-
-### Example Response
+**Response JSON**:
 
 ```json
 {
-  "reply": "I'm a helpful assistant. How can I assist you today?",
+  "reply": "Krishna is the Supreme Personality of Godhead...",
+  "session_id": "uuid...",
   "update": {
     "matched_count": 1,
     "modified_count": 1,
@@ -130,53 +108,87 @@ curl -X POST "http://localhost:8000/chatbot/chat?query=Hello"
 
 ---
 
-## 💾 MongoDB Schema (`chats` collection)
-
-Each document looks like this:
+## 🧠 MongoDB Schema (Collection: `chats`)
 
 ```json
 {
-  "session_id": "uuid-string",
+  "session_id": "uuid",
   "messages": [
-    { "role": "system",    "content": "..." },
-    { "role": "user",      "content": "..." },
+    { "role": "system", "content": "..." },
+    { "role": "user", "content": "..." },
     { "role": "assistant", "content": "..." }
   ],
-  "created_at": "ISODate",
-  "updated_at": "ISODate"
+  "created_at": "...",
+  "updated_at": "..."
 }
 ```
-
----
-
-## 🔍 View Data in MongoDB
+View in shell:
 
 ```bash
-docker exec -it chatbot_mongo mongosh
-use chatbot
+docker exec -it mongo mongosh
+use chatbot_db
 db.chats.find().pretty()
 ```
 
----
+## 🛠️ Dev Workflow (Live Reloading)
 
-## 🛠️ Dev Notes
+Thanks to Docker Compose's `develop.watch`, your code changes reflect instantly:
 
-- `chatbot.py`  
-  → Reads `session_id` from cookies  
-  → Loads previous chat from MongoDB  
-  → Sends full message history to OpenRouter  
-  → Appends new assistant reply  
-  → Calls `update_chat()` to upsert into MongoDB
-
-- `crud.py`  
-  → Uses `update_one` with `$set` (always overwrite) and `$setOnInsert` (only first insert)
-
-- Logs are saved in `log/app.log`
+- 🔄 Backend auto-reloads via `uvicorn --reload`
+- 🔄 Frontend hot-reloads via Vite (`npm run dev`)
 
 ---
 
-## 🚧 Future Improvements
 
-- [ ] Add basic frontend (React / Next.js)
-- [ ] Auth support (per-user chats)
-- [ ] Other........
+## 📦 Docker Compose (Simplified View)
+
+```yaml
+version: "3.9"
+services:
+  mongo:
+    image: mongo:6
+    ports: ["27017:27017"]
+    volumes: [mongo-data:/data/db]
+
+  frontend:
+    build: ./frontend
+    command: npm run dev -- --host
+    ports: ["5173:5173"]
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend
+          target: /app
+          ignore: [node_modules/]
+
+  backend:
+    build: ./backend
+    command: uvicorn app.main:app --reload --host 0.0.0.0 --port 7000
+    ports: ["7000:7000"]
+    develop:
+      watch:
+        - action: sync
+          path: ./backend
+          target: /app
+          ignore: [__pycache__/, "*.pyc"]
+volumes:
+  mongo-data:
+```
+---
+
+## 🧪 Test Locally (Optional)
+
+```bash
+curl -X POST http://localhost:7000/api/chatbot/chat \
+     -H "Content-Type: application/json" \
+     -d '{"query": "Explain dharma in short"}'
+```
+
+---
+
+## ✅ Future Roadmap
+
+- [x] Fullstack containerization
+- [x] MongoDB history with `session_id`
+- [ ] User authentication
+- [ ] Chat UI improvements
